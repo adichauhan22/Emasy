@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { useState } from 'react'
-import Layout from './components/Layout/Layout'
+import Layout from './pages/Layout'
 import Login from './pages/Login'
 import Signup from './pages/Signup'  // Add this import
 import Dashboard from './pages/Dashboard'
