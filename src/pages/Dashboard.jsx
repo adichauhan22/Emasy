@@ -1,5 +1,5 @@
 // File: src/pages/Dashboard.jsx
-import { Bell } from 'lucide-react';
+import { Bell, TrendingUp } from 'lucide-react';
 
 // Card base components
 // eslint-disable-next-line react/prop-types
@@ -11,15 +11,15 @@ const Card = ({ children, className = "" }) => (
 
 export default function Dashboard() {
   // Mock data for the attendance boxes
-  const attendanceData = [
-    { status: 'present' },
-    { status: 'present' },
-    { status: 'absent' },
-    { status: 'present' },
-    { status: 'present' },
-    { status: 'half' },
-    { status: 'present' },
-  ];
+  // const attendanceData = [
+  //   { status: 'present' },
+  //   { status: 'present' },
+  //   { status: 'absent' },
+  //   { status: 'present' },
+  //   { status: 'present' },
+  //   { status: 'half' },
+  //   { status: 'present' },
+  // ];
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -47,23 +47,15 @@ export default function Dashboard() {
         </Card>
 
         {/* Attendance Card */}
-        <Card className="p-4">
-          <h3 className="font-semibold mb-3">Attendance</h3>
-          <div className="flex gap-1">
-            {attendanceData.map((day, index) => (
-              <div
-                key={index}
-                className={`w-8 h-8 rounded ${
-                  day.status === 'present'
-                    ? 'bg-green-500'
-                    : day.status === 'absent'
-                    ? 'bg-red-500'
-                    : 'bg-green-200'
-                }`}
-              ></div>
-            ))}
+        {/* <Card className="p-4"> */}
+        <div className="bg-white shadow-md p-6 rounded-lg flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Attendance Rate</p>
+              <p className="text-2xl font-bold">92%</p>
+            </div>
+            <TrendingUp className="w-6 h-6 text-yellow-600" />
           </div>
-        </Card>
+        {/* </Card> */}
 
         {/* Task Progress Card */}
         <Card className="p-4">

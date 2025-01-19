@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import axios from 'axios';
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 
 export default function Signup({ setIsAuthenticated }) {
   const [formData, setFormData] = useState({
@@ -8,27 +9,40 @@ export default function Signup({ setIsAuthenticated }) {
     email: '',
     password: '',
     confirmPassword: ''
-  })
+  });
 
-  const navigate = useNavigate()
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
-    })
-  }
+    });
+  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match!')
-      return
+      setError('Passwords do not match!');
+      return;
     }
-    // Add signup logic here
-    setIsAuthenticated(true)
-    navigate('/')
-  }
+
+    try {
+      const res = await axios.post('http://localhost:5000/user/signup', formData);
+      console.log('Signup successful:', res.data);
+
+      navigate('/login');
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error('Signup error:', error);
+      setError(
+        error.response?.data?.message || 'An error occurred during signup. Please try again.'
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -36,24 +50,24 @@ export default function Signup({ setIsAuthenticated }) {
         <h2 className="text-2xl font-bold text-center mb-8">Employee Portal</h2>
         <div className="space-y-4">
           <div className="flex justify-center space-x-4 mb-8">
-            <Link 
+            <Link
               to="/login"
               className="px-4 py-2 hover:bg-gray-100 rounded font-medium transition-colors"
             >
               Login
             </Link>
-            <Link 
-              to="/signup"
-              className="px-4 py-2 bg-gray-100 rounded font-medium"
-            >
+            <Link to="/signup" className="px-4 py-2 bg-gray-100 rounded font-medium">
               Sign Up
             </Link>
           </div>
+          {error && (
+            <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-center">
+              {error}
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Employee ID
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Employee ID</label>
               <input
                 type="text"
                 name="employeeId"
@@ -65,9 +79,7 @@ export default function Signup({ setIsAuthenticated }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Full Name
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Full Name</label>
               <input
                 type="text"
                 name="fullName"
@@ -79,9 +91,7 @@ export default function Signup({ setIsAuthenticated }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Email</label>
               <input
                 type="email"
                 name="email"
@@ -93,9 +103,7 @@ export default function Signup({ setIsAuthenticated }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Password</label>
               <input
                 type="password"
                 name="password"
@@ -107,9 +115,7 @@ export default function Signup({ setIsAuthenticated }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Confirm Password
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
               <input
                 type="password"
                 name="confirmPassword"
@@ -130,5 +136,5 @@ export default function Signup({ setIsAuthenticated }) {
         </div>
       </div>
     </div>
-  )
+  );
 }

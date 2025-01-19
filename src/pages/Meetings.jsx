@@ -1,6 +1,6 @@
 import { Bell } from 'lucide-react';
 
-const MeetingsDashboard = () => {
+const Meetings = () => {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center mb-6">
@@ -35,7 +35,7 @@ const MeetingsDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Today's Schedule */}
         <div className="md:col-span-2 bg-white rounded-lg p-6 shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">Today's Schedule</h2>
+          <h2 className="text-xl font-semibold mb-4">Today&#39;s Schedule</h2>
           <div className="space-y-8">
             <MeetingCard
               title="Team Daily Standup"
@@ -129,4 +129,4 @@ const UpcomingMeeting = ({ title, time }) => (
   </div>
 );
 
-export default MeetingsDashboard;
+export default Meetings;

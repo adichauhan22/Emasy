@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 export default function Sidebar() {
   const location = useLocation()
   const menuItems = [
-    { path: '/', label: 'Dashboard', icon: '📊' },
+    { path: '/dashboard', label: 'Dashboard', icon: '📊' },
     { path: '/profile', label: 'Profile', icon: '👤' },
     { path: '/attendance', label: 'Attendance', icon: '📅' },
     { path: '/tasks', label: 'Tasks', icon: '📝' },
