@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/user.model');
 const Task = require('../models/task.model');
+const Leave = require('../models/leave.model'); 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
@@ -130,6 +131,59 @@ router.post('/login', async (req, res) => {
       res.status(500).json({ message: "Server error" });
     }
   });
+
+  router.post("/leave", async (req, res) => {
+    try {
+      const { leaveType, startDate, endDate, reason } = req.body;
   
+      console.log("Received request body:", req.body); // Log the request body
+  
+      // Validate required fields
+      if (!leaveType || !startDate || !endDate || !reason) {
+        console.log("Validation failed: Missing required fields");
+        return res.status(400).json({
+          success: false,
+          message: "All fields are required",
+        });
+      }
+  
+      // Validate date range
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+  
+      if (start > end) {
+        console.log("Validation failed: Invalid date range");
+        return res.status(400).json({
+          success: false,
+          message: "End date must be after start date",
+        });
+      }
+  
+      // Create leave request
+      const leave = await Leave.create({
+        leaveType,
+        startDate,
+        endDate,
+        reason,
+      });
+  
+      console.log("Leave request created successfully:", leave);
+  
+      // Return success response
+      res.status(201).json({
+        success: true,
+        message: "Leave request submitted successfully",
+        data: leave,
+      });
+  
+    } catch (error) {
+      console.error("Error in leave route:", error.message); // Log the error details
+      res.status(500).json({
+        success: false,
+        message: "Server error",
+        error: error.message,
+      });
+    }
+  }); 
 
 module.exports = router;

@@ -1,105 +1,88 @@
-import React from "react";
+import { useState } from "react";
+import axios from "axios";
 
-const App = () => {
+const Leave = () => {
+  const [leaveRequests, setLeaveRequests] = useState([
+    {
+      leaveType: "Annual Leave",
+      startDate: "2024-02-15",
+      endDate: "2024-02-18",
+      days: 4,
+      reason: "Family vacation",
+    }
+  ]);
+
+  // Function to handle adding a new leave request
+  const addLeaveRequest = (newRequest) => {
+    setLeaveRequests((prevRequests) => [...prevRequests, newRequest]);
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      
-
-      {/* Main Dashboard */}
       <div className="flex-1 p-6">
-        <h1 className="text-2xl font-bold mb-6">Leave Portal</h1>
-
-        {/* Summary Cards */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="bg-white shadow p-4 rounded">
-            <p className="text-gray-500">Annual Leave</p>
-            <p className="text-2xl font-bold">12 Days</p>
-          </div>
-          <div className="bg-white shadow p-4 rounded">
-            <p className="text-gray-500">Sick Leave</p>
-            <p className="text-2xl font-bold">5 Days</p>
-          </div>
-          <div className="bg-white shadow p-4 rounded">
-            <p className="text-gray-500">Used Leave</p>
-            <p className="text-2xl font-bold">8 Days</p>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-semibold text-gray-800">Leave Portal</h1>
+          <div className="flex gap-4">
+            <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-full">
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                />
+              </svg>
+            </button>
+            <div className="w-8 h-8 bg-orange-500 rounded-full"></div>
           </div>
         </div>
 
-        {/* Leave Request and History */}
-        <div className="grid grid-cols-2 gap-4">
-          {/* Leave Request */}
-          <div className="bg-white shadow p-4 rounded">
-            <h2 className="text-lg font-bold mb-4">Request Leave</h2>
-            <form className="space-y-4">
-              <div>
-                <label className="block text-gray-700">Leave Type</label>
-                <select className="w-full border-gray-300 rounded">
-                  <option>Select Leave Type</option>
-                  <option>Annual Leave</option>
-                  <option>Sick Leave</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-gray-700">Start Date</label>
-                <input
-                  type="date"
-                  className="w-full border-gray-300 rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700">End Date</label>
-                <input
-                  type="date"
-                  className="w-full border-gray-300 rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700">Reason</label>
-                <textarea
-                  className="w-full border-gray-300 rounded"
-                  rows="3"
-                ></textarea>
-              </div>
-              <button className="bg-blue-600 text-white px-4 py-2 rounded">
-                Submit
-              </button>
-            </form>
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <StatCard
+            title="Annual Leave"
+            value="12 Days"
+            subtitle="Available Balance"
+            valueColor="text-blue-500"
+          />
+          <StatCard
+            title="Sick Leave"
+            value="5 Days"
+            subtitle="Available Balance"
+            valueColor="text-green-500"
+          />
+          <StatCard
+            title="Used Leave"
+            value="8 Days"
+            subtitle="This Year"
+            valueColor="text-yellow-500"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Leave Request Form */}
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <h2 className="text-xl font-semibold mb-4">Request Leave</h2>
+            <LeaveRequestForm addLeaveRequest={addLeaveRequest} />
           </div>
 
           {/* Leave History */}
-          <div className="bg-white shadow p-4 rounded">
-            <h2 className="text-lg font-bold mb-4">Leave History</h2>
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="text-left text-gray-700">
-                  <th className="py-2">Type</th>
-                  <th className="py-2">From</th>
-                  <th className="py-2">To</th>
-                  <th className="py-2">Days</th>
-                  <th className="py-2">Status</th>
-                  <th className="py-2">Action</th>
-                </tr>
-              </thead>
-              <tbody className="text-gray-600">
-                <tr className="border-b">
-                  <td className="py-2">Annual Leave</td>
-                  <td className="py-2">Feb 15, 2024</td>
-                  <td className="py-2">Feb 18, 2024</td>
-                  <td className="py-2">4</td>
-                  <td className="py-2 text-yellow-500">Pending</td>
-                  <td className="py-2 text-red-500 cursor-pointer">Cancel</td>
-                </tr>
-                <tr>
-                  <td className="py-2">Sick Leave</td>
-                  <td className="py-2">Jan 10, 2024</td>
-                  <td className="py-2">Jan 11, 2024</td>
-                  <td className="py-2">2</td>
-                  <td className="py-2 text-green-500">Approved</td>
-                  <td className="py-2 text-blue-500 cursor-pointer">View</td>
-                </tr>
-              </tbody>
-            </table>
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Leave History</h2>
+              <select className="border rounded-md px-3 py-1 text-gray-600">
+                <option>All Leaves</option>
+                <option>Pending</option>
+                <option>Approved</option>
+                <option>Rejected</option>
+              </select>
+            </div>
+            <LeaveHistory leaveRequests={leaveRequests} />
           </div>
         </div>
       </div>
@@ -107,4 +90,162 @@ const App = () => {
   );
 };
 
-export default App;
+const StatCard = ({ title, value, subtitle, valueColor = "text-gray-900" }) => (
+  <div className="bg-white p-6 rounded-lg shadow-sm">
+    <h3 className="text-gray-600 font-medium">{title}</h3>
+    <p className={`text-3xl font-semibold ${valueColor} mt-2`}>{value}</p>
+    <p className="text-gray-500 text-sm mt-1">{subtitle}</p>
+  </div>
+);
+
+const LeaveRequestForm = ({ addLeaveRequest }) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    const formData = new FormData(e.target);
+    const startDate = new Date(formData.get("startDate"));
+    const endDate = new Date(formData.get("endDate"));
+    const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+  
+    const newRequest = {
+      leaveType: formData.get("leaveType"),
+      startDate: formData.get("startDate"),
+      endDate: formData.get("endDate"),
+      reason: formData.get("reason"),
+    };
+  
+    console.log("Submitting leave request:", newRequest); // Add this for debugging
+  
+    try {
+      const response = await axios.post("http://localhost:5000/user/leave", newRequest, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (response.status === 201) {
+        addLeaveRequest(newRequest);
+        alert("Leave request submitted successfully!");
+        e.target.reset();
+      } else {
+        alert("Leave request submission failed.");
+      }
+    } catch (error) {
+      if (error.response) {
+        // The request was made, but the server responded with a status code outside 2xx
+        console.error("Response error:", error.response);
+        alert(`Error: ${error.response.data.message || "Failed to submit leave request."}`);
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error("Request error:", error.request);
+        alert("No response from the server. Please try again later.");
+      } else {
+        // Something happened in setting up the request
+        console.error("Error:", error.message);
+        alert("An unexpected error occurred.");
+      }
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-gray-600 mb-2">Leave Type</label>
+        <select
+          name="leaveType"
+          className="w-full border rounded-lg p-2 text-gray-600"
+          required
+        >
+          <option value="" disabled selected>Select Leave Type</option>
+          <option value="Annual">Annual</option>
+          <option value="Sick">Sick</option>
+          <option value="Personal">Personal</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div>
+        <label className="block text-gray-600 mb-2">Start Date</label>
+        <input
+          name="startDate"
+          type="date"
+          className="w-full border rounded-lg p-2 text-gray-600"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-gray-600 mb-2">End Date</label>
+        <input
+          name="endDate"
+          type="date"
+          className="w-full border rounded-lg p-2 text-gray-600"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-gray-600 mb-2">Reason</label>
+        <textarea
+          name="reason"
+          placeholder="Please provide a reason for your leave request"
+          className="w-full border rounded-lg p-2 h-24 text-gray-600 resize-none"
+          required
+        />
+      </div>
+      <button
+        type="submit"
+        className="w-full bg-gray-900 text-white py-2 rounded-lg hover:bg-gray-800"
+      >
+        Submit Request
+      </button>
+    </form>
+  );
+};
+
+const LeaveHistory = ({ leaveRequests }) => (
+  <div className="overflow-x-auto">
+    <table className="w-full border-collapse">
+      <thead>
+        <tr className="text-left text-gray-700">
+          <th className="py-2">Type</th>
+          <th className="py-2">From</th>
+          <th className="py-2">To</th>
+          <th className="py-2">Days</th>
+        </tr>
+      </thead>
+      <tbody className="text-gray-600">
+        {leaveRequests.map((request, index) => (
+          <tr key={index} className="border-b last:border-b-0">
+            <td className="py-2">{request.leaveType}</td>
+            <td className="py-2">{new Date(request.startDate).toLocaleDateString()}</td>
+            <td className="py-2">{new Date(request.endDate).toLocaleDateString()}</td>
+            <td className="py-2">{request.days}</td>
+            <td className="py-2">
+              <span className={`px-2 py-1 rounded-full text-sm ${
+                request.status === "Approved"
+                  ? "bg-green-100 text-green-800"
+                  : request.status === "Pending"
+                  ? "bg-yellow-100 text-yellow-800"
+                  : "bg-red-100 text-red-800"
+              }`}>
+                {request.status}
+              </span>
+            </td>
+            <td className="py-2">
+              {request.status === "Pending" && (
+                <button className="text-red-500 hover:text-red-700">
+                  Cancel
+                </button>
+              )}
+              {request.status !== "Pending" && (
+                <button className="text-blue-500 hover:text-blue-700">
+                  View
+                </button>
+              )}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+
+export default Leave;
