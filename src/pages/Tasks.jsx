@@ -1,16 +1,22 @@
 import { PenSquare } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios"; // Import Axios for API requests
 
 const Tasks = () => {
-  const [tasks, setTasks] = useState([
-    {
-      title: "UI Design Review",
-      status: "Completed",
-      hoursSpent: "5 hours",
-      progressUpdate: "Partially changes available",
-    },
-  ]);
+  const [tasks, setTasks] = useState([]);
+
+  // Load tasks from localStorage when the component mounts
+  useEffect(() => {
+    const savedTasks = localStorage.getItem("tasks");
+    if (savedTasks) {
+      setTasks(JSON.parse(savedTasks));
+    }
+  }, []);
+
+  // Save tasks to localStorage whenever the tasks state changes
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
 
   // Function to handle adding a new task
   const addTask = (newTask) => {
@@ -197,11 +203,11 @@ const TaskList = ({ tasks }) => (
           <span
             className={`px-3 py-1 rounded-full text-sm ${
               task.status === "Completed"
-              ? "bg-green-100 text-green-800"
-              : task.status === "In Progress"
-              ? "bg-yellow-100 text-yellow-800"
-              : "bg-red-100 text-red-800"
-          }`}
+                ? "bg-green-100 text-green-800"
+                : task.status === "In Progress"
+                ? "bg-yellow-100 text-yellow-800"
+                : "bg-red-100 text-red-800"
+            }`}
           >
             {task.status}
           </span>

@@ -1,20 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 const Leave = () => {
-  const [leaveRequests, setLeaveRequests] = useState([
-    {
-      leaveType: "Annual Leave",
-      startDate: "2024-02-15",
-      endDate: "2024-02-18",
-      days: 4,
-      reason: "Family vacation",
-    }
-  ]);
+  const [leaveRequests, setLeaveRequests] = useState([]);
+  const [leaveBalances, setLeaveBalances] = useState({
+    Annual: 32,
+    Sick: 25,
+    Personal: 17,
+    Other: 24,
+  });
 
-  // Function to handle adding a new leave request
+  // Load data from localStorage when the component mounts
+  useEffect(() => {
+    const savedRequests = localStorage.getItem("leaveRequests");
+    const savedBalances = localStorage.getItem("leaveBalances");
+
+    if (savedRequests) setLeaveRequests(JSON.parse(savedRequests));
+    if (savedBalances) setLeaveBalances(JSON.parse(savedBalances));
+  }, []);
+
+  // Save data to localStorage whenever leaveRequests or leaveBalances change
+  useEffect(() => {
+    localStorage.setItem("leaveRequests", JSON.stringify(leaveRequests));
+    localStorage.setItem("leaveBalances", JSON.stringify(leaveBalances));
+  }, [leaveRequests, leaveBalances]);
+
   const addLeaveRequest = (newRequest) => {
     setLeaveRequests((prevRequests) => [...prevRequests, newRequest]);
+
+    // Update the leave balance based on the leave type
+    setLeaveBalances((prevBalances) => ({
+      ...prevBalances,
+      [newRequest.leaveType]:
+        prevBalances[newRequest.leaveType] - newRequest.days,
+    }));
   };
 
   return (
@@ -46,21 +65,21 @@ const Leave = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <StatCard
             title="Annual Leave"
-            value="12 Days"
+            value={`${leaveBalances.Annual} Days`}
             subtitle="Available Balance"
             valueColor="text-blue-500"
           />
           <StatCard
             title="Sick Leave"
-            value="5 Days"
+            value={`${leaveBalances.Sick} Days`}
             subtitle="Available Balance"
             valueColor="text-green-500"
           />
           <StatCard
-            title="Used Leave"
-            value="8 Days"
-            subtitle="This Year"
-            valueColor="text-yellow-500"
+            title="Personal Leave"
+            value={`${leaveBalances.Personal} Days`}
+            subtitle="Available Balance"
+            valueColor="text-purple-500"
           />
         </div>
 
@@ -101,28 +120,27 @@ const StatCard = ({ title, value, subtitle, valueColor = "text-gray-900" }) => (
 const LeaveRequestForm = ({ addLeaveRequest }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const formData = new FormData(e.target);
     const startDate = new Date(formData.get("startDate"));
     const endDate = new Date(formData.get("endDate"));
     const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-  
+
     const newRequest = {
       leaveType: formData.get("leaveType"),
       startDate: formData.get("startDate"),
       endDate: formData.get("endDate"),
       reason: formData.get("reason"),
+      days, // Add calculated days here
     };
-  
-    console.log("Submitting leave request:", newRequest); // Add this for debugging
-  
+
     try {
       const response = await axios.post("http://localhost:5000/user/leave", newRequest, {
         headers: {
           "Content-Type": "application/json",
         },
       });
-  
+
       if (response.status === 201) {
         addLeaveRequest(newRequest);
         alert("Leave request submitted successfully!");
@@ -131,19 +149,8 @@ const LeaveRequestForm = ({ addLeaveRequest }) => {
         alert("Leave request submission failed.");
       }
     } catch (error) {
-      if (error.response) {
-        // The request was made, but the server responded with a status code outside 2xx
-        console.error("Response error:", error.response);
-        alert(`Error: ${error.response.data.message || "Failed to submit leave request."}`);
-      } else if (error.request) {
-        // The request was made but no response was received
-        console.error("Request error:", error.request);
-        alert("No response from the server. Please try again later.");
-      } else {
-        // Something happened in setting up the request
-        console.error("Error:", error.message);
-        alert("An unexpected error occurred.");
-      }
+      console.error("Error:", error);
+      alert("An unexpected error occurred.");
     }
   };
 
@@ -208,39 +215,18 @@ const LeaveHistory = ({ leaveRequests }) => (
           <th className="py-2">Type</th>
           <th className="py-2">From</th>
           <th className="py-2">To</th>
+          <th className="py-2">Reason</th>
           <th className="py-2">Days</th>
         </tr>
       </thead>
-      <tbody className="text-gray-600">
+      <tbody>
         {leaveRequests.map((request, index) => (
-          <tr key={index} className="border-b last:border-b-0">
+          <tr key={index} className="border-t">
             <td className="py-2">{request.leaveType}</td>
-            <td className="py-2">{new Date(request.startDate).toLocaleDateString()}</td>
-            <td className="py-2">{new Date(request.endDate).toLocaleDateString()}</td>
+            <td className="py-2">{request.startDate}</td>
+            <td className="py-2">{request.endDate}</td>
+            <td className="py-2">{request.reason}</td>
             <td className="py-2">{request.days}</td>
-            <td className="py-2">
-              <span className={`px-2 py-1 rounded-full text-sm ${
-                request.status === "Approved"
-                  ? "bg-green-100 text-green-800"
-                  : request.status === "Pending"
-                  ? "bg-yellow-100 text-yellow-800"
-                  : "bg-red-100 text-red-800"
-              }`}>
-                {request.status}
-              </span>
-            </td>
-            <td className="py-2">
-              {request.status === "Pending" && (
-                <button className="text-red-500 hover:text-red-700">
-                  Cancel
-                </button>
-              )}
-              {request.status !== "Pending" && (
-                <button className="text-blue-500 hover:text-blue-700">
-                  View
-                </button>
-              )}
-            </td>
           </tr>
         ))}
       </tbody>
